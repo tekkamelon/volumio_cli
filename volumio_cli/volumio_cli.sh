@@ -2,15 +2,28 @@
 
 echo "http://<<please type your hostname>>.local"
 read "hostname"
+echo "$hostname" > /tmp/hostname &&
 
-curl http://$hostname.local/api/v1/listplaylists | sed 's/,/\n/g'
+# プレイリスト一覧を表示,sedで改行
+curl http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed 's/,/\n/g'
 
-# echo "\nplease type command" 
-echo "playback -> play"
-echo "pause -> pause"
+echo "playback -> [p]"
+echo "pause -> [P]"
 echo "stop -> stop"
-read -p "please type command" ; "command"
+
+# "q"キーを入力で終了,一覧に表示されたコマンドを入力で実行
+echo -n "command? > "
+read "command"
 	case "$command" in
-		[qQ]) echo "exit" ;;
-		*) curl http://$hostname$http.local/api/v1/commands/?cmd=$command
+		[p])
+		curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=play
+		;;
+
+		[P])
+		curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=pause 
+		;;
+
+		[s])
+		curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=stop
+		;;
 	esac
