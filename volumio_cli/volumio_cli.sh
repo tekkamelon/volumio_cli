@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # "/tmp/hostnam"eが無い場合にホスト名を設定
-if ! cat /tmp/hostname > /dev/null ; then
+if ! cat /tmp/hostname 2> /dev/null ; then
 	echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname
 else
 	:
@@ -18,6 +18,8 @@ echo "	play/pause        -> [1]"
 echo "	stop              -> [2]"
 echo "	previous          -> [3]"
 echo "	next              -> [4]"
+echo "	repeat ON/OFF     -> [5]"
+echo "	random ON/OFF     -> [6]"
 echo "	change host       -> [C]"
 echo "	exit              -> [Q]"
 echo -n -e "\n"
@@ -46,10 +48,15 @@ do
 			[4])
 				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=next && echo -n -e "\n"
 			;;
-	
-			# ホスト名の再設定
-			[C])
-				echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname ; exit 0
+
+			# リピート 
+			[5])
+				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=repeat && echo -n -e "\n"
+			;;
+
+			# ランダム
+			[6])
+				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=random && echo -n -e "\n"
 			;;
 
 			# 終了
