@@ -30,11 +30,12 @@ while :
 do
 	read -p "command? > " "command"
 		case "$command" in
-			# 再生/一時停止
+			# システム情報の表示,awkで"{"と"}"を削除
 			[0])
-				curl http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | sed 's/,/\n/g' && echo -e "\n"
+			curl http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -e "\n"
 			;;
 	
+			# 再生/一時停止
 			[1])
 				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=toggle && echo -n -e "\n"
 			;;
