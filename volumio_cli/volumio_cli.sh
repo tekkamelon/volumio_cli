@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# "/tmp/hostnam"eが無い場合にホスト名を設定
+# "/tmp/hostname"が無い場合にホスト名を設定
 if ! cat /tmp/hostname 2> /dev/null ; then
 	echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname
 else
@@ -10,7 +10,7 @@ fi
 # pingで疎通確認,成功時のみ入力を待つ
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
-	curl http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed 's/,/\n/g' && echo -e "\n" 
+	curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n" 
 
 # コマンド一覧
 echo "command list" 
