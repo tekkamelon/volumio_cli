@@ -10,10 +10,11 @@ fi
 # pingで疎通確認,成功時のみ入力を待つ
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
-	curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n" 
+	curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n"
 
 # コマンド一覧
 echo "command list" 
+echo "	systeminfo        -> [0]"
 echo "	play/pause        -> [1]"
 echo "	stop              -> [2]"
 echo "	previous          -> [3]"
@@ -30,6 +31,10 @@ do
 	read -p "command? > " "command"
 		case "$command" in
 			# 再生/一時停止
+			[0])
+				curl http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | sed 's/,/\n/g' && echo -e "\n"
+			;;
+	
 			[1])
 				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=toggle && echo -n -e "\n"
 			;;
