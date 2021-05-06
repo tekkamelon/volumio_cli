@@ -32,7 +32,7 @@ do
 		case "$command" in
 			# システム情報の表示,awkで"{"と"}"を削除
 			[0])
-			curl http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -e "\n"
+				curl http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -e "\n"
 			;;
 	
 			# 再生/一時停止
@@ -63,6 +63,11 @@ do
 			# ランダム
 			[6])
 				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=random && echo -n -e "\n"
+			;;
+
+			# ホスト名の再設定
+			[C])
+				echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname && exit 0
 			;;
 
 			# 終了
