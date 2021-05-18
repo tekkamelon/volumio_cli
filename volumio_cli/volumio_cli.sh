@@ -4,18 +4,17 @@
 if ! cat /tmp/hostname 2> /dev/null ; then
 	echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname
 else
-	:
+	: # 何もしない
 fi
 
 # pingで疎通確認,成功時のみ入力を待つ
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
-	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
-	curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' ; echo -n -e "\n"
+	# システム情報の表示,awkで"{"と"}"を削除
+	echo -n -e "\n" && curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
 
-# コマンド一覧
-echo -n -e "\n"
-echo "command list" 
-echo "	systeminfo        -> [0]"
+# コマンド一覧を表示
+echo -n -e "\n" && echo "command list" 
+echo "	playlist	      -> [0]"
 echo "	play/pause        -> [1]"
 echo "	stop              -> [2]"
 echo "	previous          -> [3]"
@@ -23,17 +22,16 @@ echo "	next              -> [4]"
 echo "	repeat ON/OFF     -> [5]"
 echo "	random ON/OFF     -> [6]"
 echo "	change host       -> [C]"
-echo "	exit              -> [Q]"
-echo -n -e "\n"
+echo "	exit              -> [Q]" && echo -n -e "\n"
 
 # "shift+q"キーを入力で終了,それ以外で一覧に表示されたコマンドを入力で実行
 while :
 do
 	read -p "command? > " "command"
 		case "$command" in
-			# システム情報の表示,awkで"{"と"}"を削除
+	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
 			[0])
-				curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -e "\n"
+				echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n"
 			;;
 	
 			# 再生/一時停止
