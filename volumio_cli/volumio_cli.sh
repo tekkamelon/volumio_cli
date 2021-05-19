@@ -14,7 +14,7 @@ if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 
 # コマンド一覧を表示
 echo -n -e "\n" && echo "command list" 
-echo "	playlist	      -> [0]"
+echo "	playlist          -> [0]"
 echo "	play/pause        -> [1]"
 echo "	stop              -> [2]"
 echo "	previous          -> [3]"
