@@ -9,8 +9,14 @@ fi
 
 # pingで疎通確認,成功時のみ入力を待つ
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
+
 	# システム情報の表示,awkで"{"と"}"を削除
 	echo -n -e "\n" && curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
+
+	# apiを叩く関数
+	curl_api () {
+			curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 && echo -n -e "\n"
+	}
 
 # コマンド一覧を表示
 echo -n -e "\n" && echo "command list" 
@@ -36,32 +42,32 @@ do
 	
 			# 再生/一時停止
 			[1])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=toggle && echo -n -e "\n"
+				curl_api toggle
 			;;
 	
 			# 停止
 			[2])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=stop && echo -n -e "\n"
+				curl_api stop
 			;;
 	
 			# 前の曲
 			[3])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=prev && echo -n -e "\n"
+				curl_api prev
 			;;
 	
 			# 次の曲
 			[4])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=next && echo -n -e "\n"
+				curl_api next
 			;;
 
 			# リピート 
 			[5])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=repeat && echo -n -e "\n"
+				curl_api repeat
 			;;
 
 			# ランダム
 			[6])
-				curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=random && echo -n -e "\n"
+				curl_api random
 			;;
 
 			# ホスト名の再設定
