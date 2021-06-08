@@ -27,6 +27,7 @@ echo "	previous          -> [3]"
 echo "	next              -> [4]"
 echo "	repeat ON/OFF     -> [5]"
 echo "	random ON/OFF     -> [6]"
+echo "	system INFO       -> [7]"
 echo "	change host       -> [C]"
 echo "	exit              -> [Q]" && echo -n -e "\n"
 
@@ -68,6 +69,11 @@ do
 			# ランダム
 			[6])
 				curl_api random
+			;;
+
+			# システム情報の表示
+			[7])
+				echo -n -e "\n" && curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
 			;;
 
 			# ホスト名の再設定
