@@ -11,11 +11,11 @@ fi
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 
 	# システム情報の表示,awkで"{"と"}"を削除
-	echo -n -e "\n" && curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
+	echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
 
 	# apiを叩く関数
 	curl_api () {
-			curl http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 && echo -n -e "\n"
+		curl -s http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 > /dev/null && echo -n -e "\n"
 	}
 
 # コマンド一覧を表示
