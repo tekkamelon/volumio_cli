@@ -10,18 +10,18 @@ fi
 # pingで疎通確認,成功時のみ入力を待つ
 if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 
-	# システム情報の表示,awkで"{"と"}"を削除
-	echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
-
 	# apiを叩く
 	curl_api () {
 		curl -s http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 > /dev/null && echo -n -e "\n"
 	}
 
-	# システム情報の表示
-	# sys_info () {
-	# 	curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo 
-	# }
+	# システム情報の表示,改行
+	sys_info () {
+		curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' 
+	}
+
+	# システム情報の表示,awkで"{"と"}"を削除
+	echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
 
 # コマンド一覧を表示
 echo -n -e "\n" && echo "command list" 
@@ -49,8 +49,7 @@ do
 	
 			# 再生/一時停止
 			[1])
-				curl_api toggle && sleep 2; curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' | grep state && echo -n -e "\n"
-
+				curl_api toggle && sleep 2; sys_info | grep state && echo -n -e "\n"
 			;;
 	
 			# 停止
@@ -80,7 +79,7 @@ do
 
 			# システム情報の表示
 			[7])
-				echo -n -e "\n" && curl -s  http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
+				echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
 			;;
 
 			# ホスト名の再設定
