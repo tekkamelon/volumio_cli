@@ -13,10 +13,15 @@ if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	# システム情報の表示,awkで"{"と"}"を削除
 	echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' && echo -n -e "\n"
 
-	# apiを叩く関数
+	# apiを叩く
 	curl_api () {
 		curl -s http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 > /dev/null && echo -n -e "\n"
 	}
+
+	# システム情報の表示
+	# sys_info () {
+	# 	curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo 
+	# }
 
 # コマンド一覧を表示
 echo -n -e "\n" && echo "command list" 
@@ -36,6 +41,7 @@ while :
 do
 	read -p "command? > " "command"
 		case "$command" in
+
 	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
 			[0])
 				echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n"
@@ -43,7 +49,8 @@ do
 	
 			# 再生/一時停止
 			[1])
-				curl_api toggle
+				curl_api toggle && sleep 2; curl -s http://$(cat /tmp/hostname).local/api/v1/getSystemInfo | awk '{print substr($0, 2, length($0)-2)}' | sed 's/,/\n/g' | grep state && echo -n -e "\n"
+
 			;;
 	
 			# 停止
