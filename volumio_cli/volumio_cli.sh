@@ -8,7 +8,7 @@ else
 fi
 
 # pingで疎通確認,成功時のみ入力を待つ
-if ping -c 3 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
+if ping -c 2 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 
 	# apiを叩く
 	curl_api () {
@@ -49,7 +49,7 @@ do
 	
 			# 再生/一時停止
 			[1])
-				curl_api toggle && sleep 2; sys_info | grep state && echo -n -e "\n"
+				curl_api toggle && sleep 1; sys_info | grep state && echo -n -e "\n"
 			;;
 	
 			# 停止
@@ -80,6 +80,13 @@ do
 			# システム情報の表示
 			[7])
 				echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
+			;;
+
+			[8])
+				echo -n -e "\n" && read -p "volume? > " "volume"
+
+				# echoでシングルクォート付きのURLをxargs経由でcurlに渡し,volumeを表示
+				echo " 'http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null && echo -n -e "\n" ; sys_info | grep volume && echo -n -e "\n"	
 			;;
 
 			# ホスト名の再設定
