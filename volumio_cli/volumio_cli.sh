@@ -33,6 +33,7 @@ echo "	next              -> [4]"
 echo "	repeat ON/OFF     -> [5]"
 echo "	random ON/OFF     -> [6]"
 echo "	system INFO       -> [7]"
+echo "	volume            -> [8]"
 echo "	change host       -> [C]"
 echo "	exit              -> [Q]" && echo -n -e "\n"
 
@@ -82,6 +83,7 @@ do
 				echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
 			;;
 
+			# 音量の調整
 			[8])
 				echo -n -e "\n" && read -p "volume? > " "volume"
 
