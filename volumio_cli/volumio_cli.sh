@@ -24,18 +24,21 @@ if ping -c 2 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
 
 # コマンド一覧を表示
-echo -n -e "\n" && echo "command list" 
-echo "	playlist          -> [0]"
-echo "	play/pause        -> [1]"
-echo "	stop              -> [2]"
-echo "	previous          -> [3]"
-echo "	next              -> [4]"
-echo "	repeat ON/OFF     -> [5]"
-echo "	random ON/OFF     -> [6]"
-echo "	system INFO       -> [7]"
-echo "	volume            -> [8]"
-echo "	change host       -> [C]"
-echo "	exit              -> [Q]" && echo -n -e "\n"
+cat << EOS
+command list
+  playlist        -> [0]
+  play/pause      -> [1]
+  stop            -> [2]
+  previous        -> [3]
+  next            -> [4]
+  repeat ON/OFF   -> [5]
+  random ON/OFF   -> [6]
+  system INFO     -> [7]
+  volume          -> [8]
+  change host     -> [C]
+  exit            -> [Q]
+EOS
+echo -n -e "\n"
 
 # "shift+q"キーを入力で終了,それ以外で一覧に表示されたコマンドを入力で実行
 while :
