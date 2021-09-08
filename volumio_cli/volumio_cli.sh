@@ -24,21 +24,26 @@ if ping -c 2 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
 
 # コマンド一覧を表示
-cat << EOS
-command list
-  playlist        -> [0]
-  play/pause      -> [1]
-  stop            -> [2]
-  previous        -> [3]
-  next            -> [4]
-  repeat ON/OFF   -> [5]
-  random ON/OFF   -> [6]
-  system INFO     -> [7]
-  volume          -> [8]
-  change host     -> [C]
-  exit            -> [Q]
+commands_list () {
+	cat << EOS
+	command list
+	  playlist        -> [0]
+	  play/pause      -> [1]
+	  stop            -> [2]
+	  previous        -> [3]
+	  next            -> [4]
+	  repeat ON/OFF   -> [5]
+	  random ON/OFF   -> [6]
+	  system INFO     -> [7]
+	  volume          -> [8]
+	  help            -> [H]
+	  change host     -> [C]
+	  exit            -> [Q]
 EOS
-echo -n -e "\n"
+	echo -n -e "\n"
+}
+
+commands_list
 
 # "shift+q"キーを入力で終了,それ以外で一覧に表示されたコマンドを入力で実行
 while :
@@ -94,6 +99,9 @@ do
 				echo " 'http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null && echo -n -e "\n" ; sys_info | grep volume && echo -n -e "\n"	
 			;;
 
+			[H])
+				commands_list
+			;;
 			# ホスト名の再設定
 			[C])
 				echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname && exit 0
