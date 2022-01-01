@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 # "/tmp/hostname"が無い場合にホスト名を設定
 if ! cat /tmp/hostname 2> /dev/null ; then
-	echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname
+	echo "http://<<hostname>>.local" && echo 'hostname > ' | tr "\n" " " && read hostname ; echo "$hostname" > /tmp/hostname
 else
 	: # 何もしない
 fi
@@ -12,7 +12,7 @@ if ping -c 2 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 
 	# apiを叩く
 	curl_api () {
-		curl -s http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 > /dev/null && echo -n -e "\n"
+		curl -s http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=$1 > /dev/null ; echo ""
 	}
 
 	# システム情報の表示,改行
@@ -21,7 +21,7 @@ if ping -c 2 $(cat /tmp/hostname).local | grep ttl > /dev/null ; then
 	}
 
 	# システム情報の表示,awkで"{"と"}"を削除
-	echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
+	echo "" && sys_info	&& echo ""	
 
 # コマンド一覧を表示
 commands_list () {
@@ -40,7 +40,7 @@ commands_list () {
 	  change host     -> [C]
 	  exit            -> [Q]
 EOS
-	echo -n -e "\n"
+	echo ""
 }
 
 commands_list
@@ -48,17 +48,18 @@ commands_list
 # "shift+q"キーを入力で終了,それ以外で一覧に表示されたコマンドを入力で実行
 while :
 do
-	read -p "command? > " "command"
+	# read -p "command? > " "command"
+	echo 'command? > ' | tr "\n" " " && read command
 		case "$command" in
 
 	# プレイリスト一覧を表示,sedで改行,echoで空白行の挿入
 			[0])
-				echo -n -e "\n" && curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo -e "\n"
+				echo "" && curl -s http://$(cat /tmp/hostname).local/api/v1/listplaylists | sed -e 's/,/\n/g' -e 's/\[//g' -e 's/\]//g' && echo ""
 			;;
 	
 			# 再生/一時停止
 			[1])
-				curl_api toggle && sleep 1; sys_info | grep state && echo -n -e "\n"
+				curl_api toggle && sleep 1; sys_info | grep state && echo ""
 			;;
 	
 			# 停止
@@ -88,23 +89,23 @@ do
 
 			# システム情報の表示
 			[7])
-				echo -n -e "\n" && sys_info	&& echo -n -e "\n"	
+				echo "" && sys_info	&& echo ""	
 			;;
 
 			# 音量の調整
 			[8])
-				echo -n -e "\n" && read -p "volume? > " "volume"
+				echo "" && echo 'volume? > ' | tr "\n" " " && read volume
 
 				# echoでシングルクォート付きのURLをxargs経由でcurlに渡し,volumeを表示
-				echo " 'http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null && echo -n -e "\n" ; sys_info | grep volume && echo -n -e "\n"	
+				echo " 'http://$(cat /tmp/hostname).local/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null && echo "" ; sys_info | grep volume && echo ""	
 			;;
 
 			[H])
-				commands_list
+				echo "" && commands_list
 			;;
 			# ホスト名の再設定
 			[C])
-				echo "http://<<hostname>>.local" && read -p "hostname? > " "hostname" ; echo "$hostname" > /tmp/hostname && exit 0
+				echo "http://<<hostname>>.local" && echo 'hostname? > ' | tr "\n" " " && read hostname ; echo "$hostname" > /tmp/hostname && exit 0
 			;;
 
 			# 終了
