@@ -1,24 +1,24 @@
-#!/bin/sh
+#!/bin/sh 
 
 # キーボードの入力を読み取りホスト名またはIPアドレスを設定
 read_hostname () {
-	echo "http://<<hostname.local or IP_adress>>" && echo 'hostname > ' | tr "\n" " " && read hostname ; echo "$hostname" > /tmp/hostname && echo ""
+	echo "http://<<hostname or IP_adress>>" && echo 'hostname > ' | tr "\n" " " && read hostname ; echo "$hostname" > /tmp/hostname && echo "" && export VOLUMIO_HOST=$(cat /tmp/hostname)
 }
 
 # "/tmp/hostname"が無い場合にホスト名を設定
 test -e /tmp/hostname || read_hostname
 
 # pingで疎通確認,成功時のみ入力を待つ
-if ping -c 2 $(cat /tmp/hostname) | grep ttl > /dev/null ; then
+if export VOLUMIO_HOST=$(cat /tmp/hostname) && ping -c 2 $VOLUMIO_HOST | grep ttl > /dev/null ; then
 
 	# apiを叩く
 	curl_api () {
-		curl -s http://$(cat /tmp/hostname)/api/v1/commands/?cmd=$1 > /dev/null ; echo ""
+		curl -s http://$VOLUMIO_HOST/api/v1/commands/?cmd=$1 > /dev/null ; echo ""
 	}
 
 	# システム情報の表示,改行
 	sys_info () {
-		echo "" && curl -s http://$(cat /tmp/hostname)/api/v1/getSystemInfo | sed -e 's/,/\n/g' -e 's/{//g' | awk -F\" '{print $2,$3,$4}' && echo ""
+		echo "" && curl -s http://$VOLUMIO_HOST/api/v1/getSystemInfo | sed -e 's/,/\n/g' -e 's/{//g' | awk -F\" '{print $2,$3,$4}' && echo ""
 	}
 
 # コマンド一覧を表示
@@ -53,7 +53,7 @@ do
 
 	# プレイリスト一覧を表示,sedで改行,awk抽出,echoで空白行の挿入
 			[0])
-				echo "" && curl -s http://$(cat /tmp/hostname)/api/v1/listplaylists | sed -e 's/,/\n/g' | awk -F\" '{print $2}' && echo ""
+				echo "" && curl -s http://$VOLUMIO_HOST/api/v1/listplaylists | sed -e 's/,/\n/g' | awk -F\" '{print $2}' && echo ""
 			;;
 	
 			# 再生/一時停止
@@ -96,7 +96,7 @@ do
 				echo "" && echo 'volume? >' | tr "\n" " " && read volume
 
 				# echoでシングルクォート付きのURLをxargs経由でcurlに渡し,volumeを表示
-				echo " 'http://$(cat /tmp/hostname)/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null ; sys_info | grep volume 
+				echo " 'http://$VOLUMIO_HOST/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null ; sys_info | grep volume 
 			;;
 
 			[H])
