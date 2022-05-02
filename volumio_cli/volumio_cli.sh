@@ -8,22 +8,24 @@ read_hostname () {
 # "/tmp/hostname"が無い場合にホスト名を設定
 test -e /tmp/hostname || read_hostname
 
-# pingで疎通確認,成功時のみ入力を待つ
-if export VOLUMIO_HOST=$(cat /tmp/hostname) && ping -c 2 $VOLUMIO_HOST | grep ttl > /dev/null ; then
+# wgetで疎通確認,成功時のみ入力を待つ
+if export VOLUMIO_HOST=$(cat /tmp/hostname) && wget -q -O - $VOLUMIO_HOST > /dev/null ; then
 
 	# apiを叩く
-	curl_api () {
-		curl -s http://$VOLUMIO_HOST/api/v1/commands/?cmd=$1 > /dev/null ; echo ""
+	hit_apt () {
+		wget -q -O - http://$VOLUMIO_HOST/api/v1/commands/?cmd=$1 > /dev/null ; echo ""
 	}
 
 	# システム情報の表示,改行
 	sys_info () {
-		echo "" && curl -s http://$VOLUMIO_HOST/api/v1/getSystemInfo | sed -e 's/,/\n/g' -e 's/{//g' | awk -F\" '{print $2,$3,$4}' && echo ""
+		echo "" && wget -q -O - http://$VOLUMIO_HOST/api/v1/getSystemInfo | sed -e 's/,/\n/g' -e 's/{//g' | awk -F\" '{print $2,$3,$4}' && echo ""
 	}
 
 # コマンド一覧を表示
 commands_list () {
 	cat << EOS
+
+	$(mpc --host=$VOLUMIO_HOST version)
 	command list
 	  playlist        -> [0]
 	  play/pause      -> [1]
@@ -51,39 +53,40 @@ do
 	echo 'command? > ' | tr "\n" " " && read command
 		case "$command" in
 
-	# プレイリスト一覧を表示,sedで改行,awk抽出,echoで空白行の挿入
+	# プレイリスト一覧を表示,trで改行,cutで抽出,echoで空白行の挿入
 			[0])
-				echo "" && curl -s http://$VOLUMIO_HOST/api/v1/listplaylists | sed -e 's/,/\n/g' | awk -F\" '{print $2}' && echo ""
+				echo "" && wget -q -O - http://$VOLUMIO_HOST/api/v1/listplaylists | tr "," "\n" | cut -d\" -f 2 && echo ""
 			;;
 	
 			# 再生/一時停止
 			[1])
-				curl_api toggle && sleep 1; sys_info | grep state && echo ""
+				hit_apt toggle && sys_info | grep status && echo ""
+
 			;;
 	
 			# 停止
 			[2])
-				curl_api stop
+				hit_apt stop
 			;;
 	
 			# 前の曲
 			[3])
-				curl_api prev
+				hit_apt prev
 			;;
 	
 			# 次の曲
 			[4])
-				curl_api next
+				hit_apt next
 			;;
 
 			# リピート 
 			[5])
-				curl_api repeat
+				hit_apt repeat
 			;;
 
 			# ランダム
 			[6])
-				curl_api random
+				hit_apt random
 			;;
 
 			# システム情報の表示
@@ -95,8 +98,8 @@ do
 			[8])
 				echo "" && echo 'volume? >' | tr "\n" " " && read volume
 
-				# echoでシングルクォート付きのURLをxargs経由でcurlに渡し,volumeを表示
-				echo " 'http://$VOLUMIO_HOST/api/v1/commands/?cmd=volume&volume=$volume'" | xargs curl -s > /dev/null ; sys_info | grep volume 
+				# echoでシングルクォート付きのURLをxargs経由でwgetに渡し,volumeを表示
+				echo "" && echo " 'http://$VOLUMIO_HOST/api/v1/commands/?cmd=volume&volume=$volume'" | xargs wget -q -O - > /dev/null ; sys_info | grep volume && echo "" 
 			;;
 
 			[H])
