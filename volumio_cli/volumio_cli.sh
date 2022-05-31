@@ -52,7 +52,7 @@ do
 	echo 'command? > ' | tr "\n" " " && read command
 		case "$command" in
 
-	# プレイリスト一覧を表示,trで改行,cutで抽出,echoで空白行の挿入
+			# プレイリスト一覧を表示,trで改行,cutで抽出,echoで空白行の挿入
 			[0])
 				echo "" && wget -q -O - http://$MPD_HOST/api/v1/listplaylists | tr "," "\n" | cut -d\" -f 2 && echo ""
 			;;
@@ -109,9 +109,10 @@ do
 			[H])
 				echo "" && commands_list
 			;;
+			 
 			# ホスト名の再設定
 			[C])
-				echo "http://<<hostname>>" && echo 'hostname? > ' | tr "\n" " " && read hostname ; echo "$hostname" > /tmp/hostname && exit 0
+				echo "http://<<hostname or IP_adress>> or localhost" && echo 'hostname? > ' | tr "\n" " " && read hostname ; export MPD_HOST=$hostname && echo "$MPD_HOST" | tee /tmp/hostname && echo ""
 			;;
 
 			# 終了
