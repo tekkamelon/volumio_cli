@@ -26,18 +26,18 @@ commands_list () {
 	cat << EOS
 
 	command list
-	  playlist        -> [0]
-	  play/pause      -> [1]
-	  stop            -> [2]
-	  previous        -> [3]
-	  next            -> [4]
-	  repeat ON/OFF   -> [5]
-	  random ON/OFF   -> [6]
-	  system INFO     -> [7]
-	  volume          -> [8]
-	  help            -> [H]
-	  change host     -> [C]
-	  exit            -> [Q]
+	  playlist      -> [0]
+	  play/pause    -> [1]
+	  stop          -> [2]
+	  previous      -> [3]
+	  next          -> [4]
+	  repeat ON/OFF -> [5]
+	  random ON/OFF -> [6]
+	  system INFO   -> [7]
+	  volume        -> [8]
+	  help          -> [H]
+	  change host   -> [C]
+	  exit          -> [Q]
 EOS
 	echo ""
 }
